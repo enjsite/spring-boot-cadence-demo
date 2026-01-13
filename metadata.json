@@ -1,0 +1,5 @@
+{
+  "name": "Cadence Order Flow System",
+  "description": "A high-reliability order processing system built with Uber Cadence, Spring Boot, and a React management dashboard. Demonstrates sagas, signals, queries, and compensations.",
+  "requestFramePermissions": []
+}

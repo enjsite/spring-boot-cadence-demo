@@ -1,0 +1,4 @@
+cadence:
+  host: ${CADENCE_HOST:localhost}
+  port: ${CADENCE_PORT:7933}
+  domain: ${CADENCE_DOMAIN:test-domain}

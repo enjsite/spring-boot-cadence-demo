@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  cassandra:
+    image: cassandra:3.11
+    container_name: cassandra
+    ports:
+      - "9042:9042"
+
+  cadence:
+    image: ubercadence/server:latest
+    container_name: cadence
+    ports:
+      - "7933:7933"
+      - "7934:7934"
+      - "7935:7935"
+      - "7939:7939"
+      - "8088:8088"
+    environment:
+      - CASSANDRA_SEEDS=cassandra
+      - CADENCE_DB=cassandra
+      - CADENCE_CASSANDRA_SEEDS=cassandra
+      - CADENCE_DB_KEYSPACE=cadence
+    depends_on:
+      - cassandra
+    #command: start
+    #entrypoint: /bin/bash -c "sleep 40; ./cadence --domain test-domain domain register; ./cadence-server start"
+
+  order-app:
+    build: .
+    container_name: order-app
+    ports:
+      - "8080:8080"
+    environment:
+      - CADENCE_HOST=cadence
+      - CADENCE_PORT=7933
+      - CADENCE_DOMAIN=test-domain
+    depends_on:
+      - cadence
