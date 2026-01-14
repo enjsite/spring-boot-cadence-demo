@@ -36,7 +36,7 @@ public class OrderWorkflowImpl implements OrderWorkflow {
             // 1 Создание заказа
             activities.createOrder(orderId);
             saga.addCompensation(() -> activities.cancelOrder(orderId));
-            status = "CREATED";
+            status = "CREATED_ORDER";
 
             // 2️ Резервирование товаров
             activities.reserveItems(orderId);
