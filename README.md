@@ -23,12 +23,9 @@ docker-compose up --build
 
 docker exec -it cadence cadence --domain test-domain --address cadence:7933 domain register
 
-5. and the Spring Boot app (order-app) to start.
+5. Start Spring Boot app (order-app).
 
-4. Access Cadence Web UI: http://localhost:8088
- to view workflow execution and history.
-
-5. Use REST API to interact with workflows:
+6. Use REST API to interact with workflows:
 
 Action	Endpoint
 - Start Order	POST http://localhost:8080/order/{orderId}
