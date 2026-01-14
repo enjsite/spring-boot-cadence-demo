@@ -34,7 +34,7 @@ public class OrderController {
         try {
             WorkflowClient.start(workflow::processOrder, workflowId);
         } catch (Exception e) {
-            return "Already created order with id " + orderId;
+            return "Already started workflow with id " + orderId;
         }
 
         return "Order workflow started: " + orderId;

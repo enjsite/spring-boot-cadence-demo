@@ -7,7 +7,8 @@ This project demonstrates order processing using **Uber Cadence** with workflow 
 - **Workflow Orchestration**: Order workflow defined in `OrderWorkflowImpl`.
 - **Signals**: Payment confirmation sent asynchronously via REST endpoint.
 - **Queries**: Retrieve order status synchronously via REST.
-- **Task Queue**: Workflow tasks are processed by `order-worker`.
+- **Task Queue**: `ORDER_TASK_QUEUE` — Cadence task queue for workflow and activity execution.
+- **Worker**: A worker started via `WorkerStarter` polls this task queue and executes workflows and activities.
 - **Deterministic Logic**: Workflow execution uses `Workflow.await` for payment waiting.
 
 ## How to Run
