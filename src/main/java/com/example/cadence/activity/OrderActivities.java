@@ -27,4 +27,7 @@ public interface OrderActivities {
 
     @ActivityMethod
     void releaseItems(String orderId);
+
+    @ActivityMethod
+    void returnShipment(String orderId);
 }

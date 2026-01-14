@@ -1,9 +1,8 @@
 package com.example.cadence.workflow;
 
+import com.uber.cadence.workflow.Saga;
 import com.uber.cadence.workflow.Workflow;
 import com.uber.cadence.activity.ActivityOptions;
-import com.uber.cadence.workflow.WorkflowMethod;
-import com.uber.cadence.workflow.Async;
 
 import java.time.Duration;
 
@@ -27,23 +26,52 @@ public class OrderWorkflowImpl implements OrderWorkflow {
 
     @Override
     public void processOrder(String orderId) {
-        status = "PAYMENT_PENDING";
-        Workflow.sleep(Duration.ofSeconds(1)); // симуляция начальной обработки
-        activities.createOrder(orderId);
-        activities.reserveItems(orderId);
+        // Инициализация Saga
+        Saga saga = new Saga(new Saga.Options.Builder()
+                .setParallelCompensation(false) // компенсации строго по порядку
+                .build());
 
-        // Ожидание оплаты с таймаутом 5 минут
-        boolean paymentArrived = Workflow.await(Duration.ofMinutes(5), () -> paymentReceived);
+        try {
+            status = "CREATED";
 
-        if (paymentArrived) {
-            status = "COMPLETED";
+            // 1 Создание заказа
+            activities.createOrder(orderId);
+            saga.addCompensation(() -> activities.cancelOrder(orderId));
+
+            // 2️ Резервирование товаров
+            activities.reserveItems(orderId);
+            saga.addCompensation(() -> activities.releaseItems(orderId));
+
+            status = "PAYMENT_PENDING";
+
+            // 3 Ожидание оплаты (5 минут)
+            boolean paymentArrived = Workflow.await(
+                    Duration.ofMinutes(5),
+                    () -> paymentReceived
+            );
+
+            if (!paymentArrived) {
+                status = "CANCELED";
+                saga.compensate();
+                return;
+            }
+
+            // 4️ Оплата
             activities.chargeMoney(orderId);
+            saga.addCompensation(() -> activities.refundMoney(orderId));
+
+            // 5️ Отгрузка
             activities.shipOrder(orderId);
+            saga.addCompensation(() -> activities.returnShipment(orderId));
+
+            // 6️ Завершение заказа
             activities.completeOrder(orderId);
-        } else {
+            status = "COMPLETED";
+
+        } catch (Exception e) {
             status = "CANCELED";
-            activities.releaseItems(orderId);
-            activities.cancelOrder(orderId);
+            saga.compensate();
+            throw e;
         }
     }
 

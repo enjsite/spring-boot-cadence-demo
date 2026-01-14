@@ -47,4 +47,9 @@ public class OrderActivitiesImpl implements OrderActivities {
     public void releaseItems(String orderId) {
         logger.info("Releasing items for order: {}", orderId);
     }
+
+    @Override
+    public void returnShipment(String orderId) {
+        logger.info("Return shipment for order: {}", orderId);
+    }
 }
