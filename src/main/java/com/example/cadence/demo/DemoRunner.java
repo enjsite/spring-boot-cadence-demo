@@ -31,14 +31,14 @@ public class DemoRunner implements CommandLineRunner {
                 .build();
 
         OrderWorkflow workflow1 = client.newWorkflowStub(OrderWorkflow.class, options);
-        //workflow1.processOrder("ORDER-1");- это неправильно, вызов должен быть асинхронным
+        // Асинхронно стартуем workflow1
         WorkflowClient.start(workflow1::processOrder, "ORDER-1");
         workflow1.paymentConfirmed(); // сразу платёж
         logger.info("Status ORDER-1: {}", workflow1.getStatus());
 
         logger.info("=== DEMO SCENARIO 2: Delayed payment ===");
         OrderWorkflow workflow2 = client.newWorkflowStub(OrderWorkflow.class, options);
-        // 1️⃣ Асинхронно стартуем workflow2
+        // Асинхронно стартуем workflow2
         WorkflowClient.start(workflow2::processOrder, "ORDER-2");
 
         new Thread(() -> {
