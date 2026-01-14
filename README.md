@@ -44,9 +44,9 @@ curl http://localhost:8080/order/1/status
 
 ## Workflow Behavior
 
-1. When an order is started, the workflow enters a WAITING_FOR_PAYMENT state.
+1. When an order is started, the workflow enters a CREATED -> PAYMENT_PENDING state.
 2. Payment confirmation is sent as a signal to the workflow.
-3. The workflow updates its status to PAID and completes.
+3. The workflow updates its status to PAID -> SHIPPED and completes.
 4. If payment is delayed or fails, workflow can handle timeouts or compensation logic (extendable).
 
 ## Why Cadence?

@@ -32,16 +32,15 @@ public class OrderWorkflowImpl implements OrderWorkflow {
                 .build());
 
         try {
-            status = "CREATED";
 
             // 1 Создание заказа
             activities.createOrder(orderId);
             saga.addCompensation(() -> activities.cancelOrder(orderId));
+            status = "CREATED";
 
             // 2️ Резервирование товаров
             activities.reserveItems(orderId);
             saga.addCompensation(() -> activities.releaseItems(orderId));
-
             status = "PAYMENT_PENDING";
 
             // 3 Ожидание оплаты (5 минут)
@@ -59,10 +58,12 @@ public class OrderWorkflowImpl implements OrderWorkflow {
             // 4️ Оплата
             activities.chargeMoney(orderId);
             saga.addCompensation(() -> activities.refundMoney(orderId));
+            status = "PAID";
 
             // 5️ Отгрузка
             activities.shipOrder(orderId);
             saga.addCompensation(() -> activities.returnShipment(orderId));
+            status = "SHIPPED";
 
             // 6️ Завершение заказа
             activities.completeOrder(orderId);
